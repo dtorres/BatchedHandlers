@@ -7,7 +7,6 @@
 //
 
 #import "BHBlockManager.h"
-#import "BHDemuxerBlock.h"
 
 @interface BHBlockManager ()
 
