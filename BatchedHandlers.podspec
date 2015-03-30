@@ -1,13 +1,7 @@
 Pod::Spec.new do |s|
   s.name             = "BatchedHandlers"
   s.version          = "0.1.0"
-  s.summary          = "A short description of BatchedHandlers."
-  s.description      = <<-DESC
-                       An optional longer description of BatchedHandlers
-
-                       * Markdown format.
-                       * Don't worry about the indent, we strip it!
-                       DESC
+  s.summary          = "A helper class to handle multiple completion handlers for a task"
   s.homepage         = "https://github.com/dtorres/BatchedHandlers"
   s.license          = 'MIT'
   s.author           = { "Diego Torres" => "contact@dtorres.me" }
