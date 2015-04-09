@@ -10,7 +10,7 @@
 
 @interface BHBlockManager ()
 
-@property (nonatomic, readonly) id target;
+@property (weak, nonatomic, readonly) id target;
 @property (nonatomic, readonly) SEL selector;
 @property (nonatomic, readonly) BHHandlerInvoker invoker;
 @property (nonatomic, readonly) dispatch_queue_t serialQueue;
@@ -72,8 +72,12 @@
 
 - (void)_performSelectorWithArguments:(NSArray *)arguments
 {
-    NSInvocation *invocation = [NSInvocation invocationWithMethodSignature:[self.target methodSignatureForSelector:self.selector]];
-    invocation.target = self.target;
+    __strong id strongTarget = self.target;
+    if (!strongTarget) {
+        return;
+    }
+    NSInvocation *invocation = [NSInvocation invocationWithMethodSignature:[strongTarget methodSignatureForSelector:self.selector]];
+    invocation.target = strongTarget;
     invocation.selector = self.selector;
     
     //Set all the arguments
