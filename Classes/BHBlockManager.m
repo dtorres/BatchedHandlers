@@ -59,6 +59,9 @@
 
 - (void)performWithArguments:(NSArray *)argArray handler:(id)block
 {
+    if (!block) {
+        block = [NSNull null];
+    }
     dispatch_async(self.serialQueue, ^{
         NSMutableArray *handlers = [self _handlersForArguments:argArray];
         [handlers addObject:block];
@@ -110,6 +113,9 @@
             [self.argumentsHandlers removeObjectForKey:arguments];
         });
         for (id block in handlers) {
+            if ([block isKindOfClass:[NSNull class]]) {
+                continue;
+            }
             dispatch_async(self.queue, ^{
                 self.invoker(resultArguments, block);
             });
