@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name             = "BatchedHandlers"
-  s.version          = "0.1.0"
+  s.version          = "0.2.0"
   s.summary          = "A helper class to handle multiple completion handlers for a task"
   s.homepage         = "https://github.com/dtorres/BatchedHandlers"
   s.license          = 'MIT'
@@ -12,5 +12,6 @@ Pod::Spec.new do |s|
   s.osx.deployment_target = '10.8'
 
   s.requires_arc = true
-  s.source_files = 'Classes/BHBlockManager.{h,m}'
+  s.source_files = 'Classes/*.{h,m}'
+  s.public_header_files = 'Classes/BHManager.h'
 end

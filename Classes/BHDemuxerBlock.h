@@ -12,6 +12,6 @@ typedef NSArray *(^BHBlocksRetriever)(void);
 
 @interface BHDemuxerBlock : NSObject <NSCopying>
 
-- (instancetype)initWithSampleBlock:(id)block blockRetriever:(BHBlocksRetriever)retriever queue:(dispatch_queue_t)queue;
+- (instancetype)initWithSampleBlock:(id)block blockRetriever:(BHBlocksRetriever)retriever;
 
 @end
