@@ -11,7 +11,7 @@
 @interface BHManager : NSObject
 
 /**
- Set a sample handler, used to create the handler returned by @c addHandler:forKey
+ @abstract Set a sample handler, used to create the handler returned by @c addHandler:forKey
  
  @param handler A sample handler with the same interface as those added
  @param key The key used to group the handlers
@@ -21,7 +21,7 @@
 - (void)setSampleHandler:(id)handler forKey:(id <NSCopying>)key;
 
 /**
- Add a handler to a batch group
+ @abstract Add a handler to a batch group
  
  @param handler A block to be notified when work is done
  @param key The key used to group the handlers
@@ -35,7 +35,7 @@
 @end
 
 /**
- Add a handler to a batch group
+ @abstract Add a handler to a batch group
  
  @param manager The manager of the handlers.
  @param handler A block to be notified when work is done
