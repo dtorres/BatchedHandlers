@@ -4,7 +4,7 @@ Easily batch handlers while doing the work once and call all of them as if you w
 
 ## Usage
 
-```
+```objc
 //Create a manager
 self.manager = [BHManager new];
 
@@ -31,12 +31,12 @@ self.manager = [BHManager new];
 
 In case you want to accept NULL handlers, you must register a sample block beforehand:
 
-```
+```objc
 //Note this block is never executed nor does it need to do anything, 
 //just be of the same interface as the passed handlers
 
 [self.manager setSampleHandler:^(id r, NSError *e){}
-              forKey:@NSStringFromSelector(@selector(doAsyncWork:))];
+              forKey:NSStringFromSelector(@selector(doAsyncWork:))];
 ```
 
 ## Installation
