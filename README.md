@@ -15,16 +15,18 @@ self.manager = [BHManager new];
 {
   //Any cache checking goes here...
   
-  //The manager returns a block with the same interface as the passed block
-  handler = BHManagerAddHandler(self.manager,handler,NSStringFromSelector(_cmd)); //We use the selector as a key
-  //Continue only if a handler is returned 
-  if (!handler) {
+  //The manager returns an array that will contain all the handlers to call.
+  NSArray *handlers = BHManagerAddHandler(self.manager,handler,NSStringFromSelector(_cmd)); //We use the selector as a key
+  //Continue only if an array is returned 
+  if (!handlers) {
     return;
   }
 
   dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
     //Do async work
-    handler(result, error);
+    for(typeof(handler) aHandler in handlers) {
+      aHandler(result, error);
+    }
   });
 }
 ```

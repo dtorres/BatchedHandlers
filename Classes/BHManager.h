@@ -11,39 +11,15 @@
 @interface BHManager : NSObject
 
 /**
- @abstract Set a sample handler, used to create the handler returned by @c addHandler:forKey
- 
- @param handler A sample handler with the same interface as those added
- @param key The key used to group the handlers
- 
- @note This method is only necessary if you allow @c NULL handlers for a certain key.
- */
-- (void)setSampleHandler:(id)handler forKey:(id <NSCopying>)key;
-
-/**
  @abstract Add a handler to a batch group
  
  @param handler A block to be notified when work is done
  @param key The key used to group the handlers
  
- @return A block of the same interface to call when work is completed or nil is work in progress.
+ @return A @c promise array to access all pending handlers.
  
- @note Prefer @b BHManagerAddHandler as it provides type safety for the handler.
+ @note The returned array is also indication that you must perform the work. May return nil, in which case in most cases you should just end work from your method.
  */
-- (id)addHandler:(id)handler forKey:(id <NSCopying>)key;
+- (NSArray *)addHandler:(id)handler forKey:(id <NSCopying>)key;
 
 @end
-
-/**
- @abstract Add a handler to a batch group
- 
- @param manager The manager of the handlers.
- @param handler A block to be notified when work is done
- @param key The key used to group the handlers
- 
- @return A block of the same interface to call when work is completed or nil is work in progress.
- 
- @see -addHandler:forKey:
- */
-#define BHManagerAddHandler(manager, handler, key) \
-(typeof(handler))[manager addHandler:handler forKey:key]

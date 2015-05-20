@@ -7,9 +7,17 @@
 //
 
 #import "BHManager.h"
-#import "BHDemuxerBlock.h"
 
-extern const char *BHBlockSignature(id blockObj); //Implemented in BHDemuxerBlock.m
+typedef NSArray *(^BHBlocksRetriever)(void);
+
+@interface _BHPromiseArray : NSProxy {
+    BHBlocksRetriever _retrieverBlock;
+    NSArray *_actualArray;
+}
+
+- (instancetype)initWithArrayRetriever:(BHBlocksRetriever)retriever;
+
+@end
 
 @interface BHManager ()
 
@@ -43,7 +51,7 @@ NS_INLINE NSMutableArray *BHHandlersForKey(BHManager *self, id <NSCopying> key) 
 - (id)addHandler:(id)inBlock forKey:(id<NSCopying>)key
 {
     NSParameterAssert(key);
-    __block BOOL retBatchedBlock;
+    __block BOOL retPromiseArray;
     dispatch_sync(self.serialQueue, ^{
         id aBlock = inBlock;
         NSMutableArray *handlers = BHHandlersForKey(self, key);
@@ -54,37 +62,56 @@ NS_INLINE NSMutableArray *BHHandlersForKey(BHManager *self, id <NSCopying> key) 
         if (aBlock) {
             [handlers addObject:aBlock];
         }
-        retBatchedBlock = emptyHandlers;
+        retPromiseArray = emptyHandlers;
     });
-    return retBatchedBlock ? [self _batchedHandlerWithSampleBlock:inBlock key:key] : nil;
-}
-
-- (void)setSampleHandler:(id)handler forKey:(id<NSCopying>)key
-{
-    NSParameterAssert(handler);
-    NSParameterAssert(key);
-    self.sampleBlocks[key] = handler;
-}
-
-- (id)_batchedHandlerWithSampleBlock:(id)block key:(id <NSCopying>)key
-{
-    block = block ? : self.sampleBlocks[key];
-    if (block == nil) {
-        NSString *reason = [NSString stringWithFormat:@"You must provide a sample block for key \"%@\" if you accept NULL handlers", key];
-        [[NSException exceptionWithName:NSInternalInconsistencyException reason:reason userInfo:nil] raise];
+    
+    if (retPromiseArray) {
+        return [[_BHPromiseArray alloc] initWithArrayRetriever:^NSArray *{
+            __block NSMutableArray *handlers;
+            dispatch_sync(self.serialQueue, ^{
+                handlers = [self.handlersPerKey objectForKey:key];
+                [self.handlersPerKey removeObjectForKey:key];
+            });
+            if ([handlers.firstObject isKindOfClass:[NSNull class]]) {
+                [handlers removeObjectAtIndex:0];
+            }
+            return handlers;
+        }];
     }
-    id blockDemuxer = [[BHDemuxerBlock alloc] initWithSampleBlock:block blockRetriever:^NSArray *{
-        __block NSMutableArray *handlers;
-        dispatch_sync(self.serialQueue, ^{
-            handlers = [self.handlersPerKey objectForKey:key];
-            [self.handlersPerKey removeObjectForKey:key];
-        });
-        if ([handlers.firstObject isKindOfClass:[NSNull class]]) {
-            [handlers removeObjectAtIndex:0];
-        }
-        return handlers;
-    }];
-    return blockDemuxer;
+    return nil;
+}
+
+@end
+
+@implementation _BHPromiseArray
+
+- (instancetype)initWithArrayRetriever:(BHBlocksRetriever)retriever
+{
+    NSParameterAssert(retriever);
+    _retrieverBlock = retriever;
+    
+    return self;
+}
+
+- (Class)class
+{
+    return NSArray.class;
+}
+
+- (NSMethodSignature *)methodSignatureForSelector:(SEL)sel
+{
+    return _actualArray ? [_actualArray methodSignatureForSelector:sel] : [NSArray instanceMethodSignatureForSelector:sel];
+}
+
+- (id)forwardingTargetForSelector:(SEL)aSelector
+{
+    NSArray *array = _actualArray;
+    if (!array) {
+        array = [_retrieverBlock() copy];
+        _retrieverBlock = nil;
+        _actualArray = array;
+    }
+    return array;
 }
 
 @end
