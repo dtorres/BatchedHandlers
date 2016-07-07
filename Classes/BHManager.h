@@ -20,6 +20,6 @@
  
  @note The returned array is also indication that you must perform the work. May return nil, in which case in most cases you should just end work from your method.
  */
-- (NSArray *)addHandler:(id)handler forKey:(id <NSCopying>)key;
+- (NSArray * _Nullable)addHandler:(id _Nullable)handler forKey:(_Nonnull id <NSCopying>)key NS_SWIFT_NAME(add(handler:forKey:));
 
 @end

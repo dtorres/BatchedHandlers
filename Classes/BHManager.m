@@ -23,7 +23,6 @@ typedef NSArray *(^BHBlocksRetriever)(void);
 
 @property (nonatomic, readonly) dispatch_queue_t serialQueue;
 @property (nonatomic, readonly) NSMutableDictionary *handlersPerKey;
-@property (nonatomic, readonly) NSMutableDictionary *sampleBlocks;
 
 @end
 
@@ -34,7 +33,6 @@ typedef NSArray *(^BHBlocksRetriever)(void);
     if (self = [super init]) {
         _serialQueue = dispatch_queue_create(NULL, DISPATCH_QUEUE_SERIAL);
         _handlersPerKey = [NSMutableDictionary new];
-        _sampleBlocks = [NSMutableDictionary new];
     }
     return self;
 }
